@@ -1,0 +1,34 @@
+import { useState, useEffect } from 'react';
+
+interface SearchBoxProps {
+    onSearch: (keyword: string) => void;
+    placeholder?: string;
+}
+
+export default function SearchBox({ onSearch, placeholder }: SearchBoxProps) {
+    const [inputValue, setInputValue] = useState('');
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onSearch(inputValue.trim());
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [inputValue, onSearch]);
+
+    return (
+        <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={placeholder ?? 'Tìm kiếm theo tên môn học...'}
+            style={{
+                width: '100%',
+                padding: '10px 14px',
+                fontSize: 14,
+                border: '1px solid #ccc',
+                borderRadius: 6,
+                marginBottom: 16,
+            }}
+        />
+    );
+}

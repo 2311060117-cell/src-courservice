@@ -1,27 +1,27 @@
-import { useEffect, useState } from 'react';
-import { getCourses } from './api/courseApi';
-import type { Course } from './types/course';
+import { useState } from 'react';
+import { useCourses } from './api/useCourses';
+import SearchBox from './components/SearchBox';
+import CourseList from './components/CourseList';
+import Pagination from './components/Pagination';
 
 function App() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [error, setError] = useState<string | null>(null);
+    const [keyword, setKeyword] = useState('');
+    const [page, setPage] = useState(0);
+    const { courses, totalPages, state, errorMessage, refetch } = useCourses(keyword, page);
 
-  useEffect(() => {
-    getCourses()
-      .then((res) => setCourses(res.data.content))
-      .catch((err: any) => {
-        console.error(err);
-        setError('Khong ket noi duoc toi he thong. Kiem tra lai api-gateway da chay chua.');
-      });
-  }, []);
+    const handleSearch = (newKeyword: string) => {
+        setKeyword(newKeyword);
+        setPage(0);
+    };
 
-  return (
-    <div style={{ padding: 24, fontFamily: 'sans-serif' }}>
-      <h1>Kiem tra ket noi CRS qua Gateway</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <pre>{JSON.stringify(courses, null, 2)}</pre>
-    </div>
-  );
+    return (
+        <div style={{ padding: 24, fontFamily: 'Arial, sans-serif', maxWidth: 800, margin: '0 auto' }}>
+            <h2>📚 Danh Sách Môn Học (CRS)</h2>
+            <SearchBox onSearch={handleSearch} />
+            <CourseList courses={courses} state={state} errorMessage={errorMessage} onRetry={refetch} />
+            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+        </div>
+    );
 }
 
 export default App;
