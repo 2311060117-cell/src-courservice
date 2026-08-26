@@ -6,8 +6,8 @@ interface CourseListProps {
     state: LoadState;
     errorMessage: string;
     onRetry: () => void;
-    onEdit: (course: Course) => void;
-    onDelete: (course: Course) => void;
+    onEdit?: (course: Course) => void;
+    onDelete?: (course: Course) => void;
 }
 
 export default function CourseList({
@@ -18,50 +18,49 @@ export default function CourseList({
                                        onEdit,
                                        onDelete,
                                    }: CourseListProps) {
-    if (state === 'loading') return <p>⏳ Đang tải danh sách môn học...</p>;
+    if (state === 'loading') return <p>Đang tải danh sách môn học...</p>;
 
     if (state === 'error') {
         return (
-            <div style={{ color: '#b91c1c', padding: 12, border: '1px solid #f87171', borderRadius: 6 }}>
-                <p>⚠️ {errorMessage}</p>
-                <button onClick={onRetry} style={{ cursor: 'pointer', padding: '6px 12px' }}>
-                    Thử lại
-                </button>
+            <div style={{ color: '#b91c1c' }}>
+                <p>{errorMessage}</p>
+                <button onClick={onRetry}>Thử lại</button>
             </div>
         );
     }
 
-    if (state === 'empty') return <p>🔍 Không tìm thấy môn học nào phù hợp.</p>;
+    if (state === 'empty') return <p>Không tìm thấy môn học nào phù hợp.</p>;
+
+    const showActions = !!onEdit || !!onDelete;
 
     return (
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-            <tr style={{ borderBottom: '2px solid #ccc', paddingBottom: 8 }}>
-                <th style={{ padding: 8 }}>Tên môn học</th>
-                <th style={{ padding: 8 }}>Số tín chỉ</th>
-                <th style={{ padding: 8 }}>Số chỗ còn lại</th>
-                <th style={{ padding: 8 }}>Thao tác</th>
+            <tr style={{ textAlign: 'left', borderBottom: '2px solid #333' }}>
+                <th>Tên môn học</th>
+                <th>Số tín chỉ</th>
+                <th>Số chỗ còn lại</th>
+                {showActions && <th>Thao tác</th>}
             </tr>
             </thead>
             <tbody>
             {courses.map((course) => (
                 <tr key={course.id} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: 8 }}>{course.tenMonHoc}</td>
-                    <td style={{ padding: 8 }}>{course.soTinChi}</td>
-                    <td style={{ padding: 8, color: course.soChoConLai === 0 ? '#b91c1c' : 'green', fontWeight: 'bold' }}>
+                    <td>{course.tenMonHoc}</td>
+                    <td>{course.soTinChi}</td>
+                    <td style={{ color: course.soChoConLai === 0 ? '#b91c1c' : 'inherit' }}>
                         {course.soChoConLai} / {course.soChoToiDa}
                     </td>
-                    <td style={{ padding: 8 }}>
-                        <button onClick={() => onEdit(course)} style={{ cursor: 'pointer', padding: '4px 8px' }}>
-                            Sửa
-                        </button>
-                        <button
-                            onClick={() => onDelete(course)}
-                            style={{ marginLeft: 8, color: '#b91c1c', cursor: 'pointer', padding: '4px 8px' }}
-                        >
-                            Xóa
-                        </button>
-                    </td>
+                    {showActions && (
+                        <td>
+                            {onEdit && <button onClick={() => onEdit(course)}>Sửa</button>}
+                            {onDelete && (
+                                <button onClick={() => onDelete(course)} style={{ marginLeft: 8, color: '#b91c1c' }}>
+                                    Xóa
+                                </button>
+                            )}
+                        </td>
+                    )}
                 </tr>
             ))}
             </tbody>
