@@ -1,13 +1,23 @@
-import type { Course } from '../types/course';
-import type { LoadState } from '../api/useCourses';
+import React from 'react';
+
+interface Course {
+    id: number;
+    tenMonHoc?: string;
+    name?: string;
+    soTinChi?: number;
+    credits?: number;
+    soChoConLai?: number;
+    soChoToiDa?: number;
+    tongSoCho?: number;
+}
 
 interface CourseListProps {
     courses: Course[];
-    state: LoadState;
-    errorMessage: string;
-    onRetry: () => void;
-    onEdit?: (course: Course) => void;
-    onDelete?: (course: Course) => void;
+    state?: string;
+    errorMessage?: string;
+    onRetry?: () => void;
+    onRegister: (courseId: number) => void;
+    registeringId?: number | null;
 }
 
 export default function CourseList({
@@ -15,54 +25,69 @@ export default function CourseList({
                                        state,
                                        errorMessage,
                                        onRetry,
-                                       onEdit,
-                                       onDelete,
+                                       onRegister,
+                                       registeringId,
                                    }: CourseListProps) {
-    if (state === 'loading') return <p>Đang tải danh sách môn học...</p>;
+    if (state === 'loading') return <p style={{ color: '#fff' }}>Đang tải danh sách môn học...</p>;
 
     if (state === 'error') {
         return (
-            <div style={{ color: '#b91c1c' }}>
-                <p>{errorMessage}</p>
-                <button onClick={onRetry}>Thử lại</button>
+            <div style={{ color: '#ff6b6b', textAlign: 'center', margin: '20px 0' }}>
+                <p>Lỗi: {errorMessage || 'Không thể tải dữ liệu'}</p>
+                {onRetry && (
+                    <button onClick={onRetry} style={{ padding: '6px 12px', cursor: 'pointer', borderRadius: '4px' }}>
+                        Thử lại
+                    </button>
+                )}
             </div>
         );
     }
 
-    if (state === 'empty') return <p>Không tìm thấy môn học nào phù hợp.</p>;
-
-    const showActions = !!onEdit || !!onDelete;
-
     return (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', color: '#fff', textAlign: 'left' }}>
             <thead>
-            <tr style={{ textAlign: 'left', borderBottom: '2px solid #333' }}>
-                <th>Tên môn học</th>
-                <th>Số tín chỉ</th>
-                <th>Số chỗ còn lại</th>
-                {showActions && <th>Thao tác</th>}
+            <tr style={{ borderBottom: '2px solid #555' }}>
+                <th style={{ padding: '12px' }}>Tên môn học</th>
+                <th style={{ padding: '12px', textAlign: 'center' }}>Số tín chỉ</th>
+                <th style={{ padding: '12px', textAlign: 'center' }}>Số chỗ còn lại</th>
+                <th style={{ padding: '12px', textAlign: 'center' }}>Hành động</th>
             </tr>
             </thead>
             <tbody>
-            {courses.map((course) => (
-                <tr key={course.id} style={{ borderBottom: '1px solid #eee' }}>
-                    <td>{course.tenMonHoc}</td>
-                    <td>{course.soTinChi}</td>
-                    <td style={{ color: course.soChoConLai === 0 ? '#b91c1c' : 'inherit' }}>
-                        {course.soChoConLai} / {course.soChoToiDa}
-                    </td>
-                    {showActions && (
-                        <td>
-                            {onEdit && <button onClick={() => onEdit(course)}>Sửa</button>}
-                            {onDelete && (
-                                <button onClick={() => onDelete(course)} style={{ marginLeft: 8, color: '#b91c1c' }}>
-                                    Xóa
-                                </button>
-                            )}
+            {courses && courses.length > 0 ? (
+                courses.map((course) => (
+                    <tr key={course.id} style={{ borderBottom: '1px solid #333' }}>
+                        <td style={{ padding: '12px' }}>{course.tenMonHoc || course.name}</td>
+                        <td style={{ padding: '12px', textAlign: 'center' }}>{course.soTinChi || course.credits}</td>
+                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                            {(course.soChoConLai ?? 30)} / {(course.soChoToiDa ?? course.tongSoCho ?? 30)}
                         </td>
-                    )}
+                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                            <button
+                                onClick={() => onRegister(course.id)}
+                                disabled={registeringId === course.id}
+                                style={{
+                                    backgroundColor: registeringId === course.id ? '#6c757d' : '#28a745',
+                                    color: '#fff',
+                                    border: 'none',
+                                    padding: '8px 16px',
+                                    borderRadius: '4px',
+                                    cursor: registeringId === course.id ? 'not-allowed' : 'pointer',
+                                    fontWeight: 'bold'
+                                }}
+                            >
+                                {registeringId === course.id ? 'Đang xử lý...' : 'Đăng ký'}
+                            </button>
+                        </td>
+                    </tr>
+                ))
+            ) : (
+                <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', padding: '20px' }}>
+                        Không có môn học nào.
+                    </td>
                 </tr>
-            ))}
+            )}
             </tbody>
         </table>
     );

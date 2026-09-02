@@ -1,4 +1,4 @@
-package vn.edu.crs.registrationservice;
+package vn.edu.crs.registrationservice.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

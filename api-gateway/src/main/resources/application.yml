@@ -6,38 +6,18 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      globalcors:
-        add-to-simple-url-handler-mapping: true
-        cors-configurations:
-          '[/**]':
-            allowedOrigins:
-              - "http://localhost:5173"
-              - "http://localhost:5174"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
       routes:
+        - id: course-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/courses/**, /courses/**, /api/public/**
+
         - id: auth-service
           uri: http://localhost:8081
           predicates:
             - Path=/api/auth/**
 
-        - id: course-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/courses/**
-          filters:
-            - StripPrefix=1
-
         - id: registration-service
           uri: http://localhost:8083
           predicates:
             - Path=/api/registrations/**
-
-jwt:
-  secret: CRS-Microservices-Secret-Key-Nam-3-Hoc-Ky-2026-Doi-Trong-Thuc-Te

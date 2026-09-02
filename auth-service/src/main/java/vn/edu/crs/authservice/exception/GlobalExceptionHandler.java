@@ -1,46 +1,31 @@
-// path: auth-service/src/main/java/vn/edu/crs/authservice/exception/GlobalExceptionHandler.java
-// purpose: chuan hoa response loi, tranh lo stack trace/thong tin noi bo ra client
-
 package vn.edu.crs.authservice.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidCredentials(
-            InvalidCredentialsException ex, WebRequest request) {
-        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", e.getMessage()));
     }
 
-    // bat moi exception con lai chua duoc xu ly rieng, tranh loi 500 lo stack trace
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentials(BadCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Tên đăng nhập hoặc mật khẩu không chính xác"));
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex, WebRequest request) {
-        log.error("Unhandled exception at {}", request.getDescription(false), ex);
-
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Da co loi xay ra, vui long thu lai sau", request);
-    }
-
-    private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String message, WebRequest request) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", Instant.now().toString());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("message", message);
-        body.put("path", request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(status).body(body);
+    public ResponseEntity<?> handleGeneralException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Lỗi hệ thống: " + e.getMessage()));
     }
 }

@@ -1,30 +1,25 @@
-// path: auth-service/src/main/java/vn/edu/crs/authservice/entity/User.java
-// purpose: entity luu tai khoan dang nhap, mat khau da ma hoa BCrypt, va role
-
 package vn.edu.crs.authservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "app_user")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
-    private String password; // luon luu dang da ma hoa BCrypt, khong bao gio luu plain text
+    private String password;
 
-    @Column(nullable = false, length = 20)
-    private String role; // "ADMIN" hoac "STUDENT"
+    private String role;
 }

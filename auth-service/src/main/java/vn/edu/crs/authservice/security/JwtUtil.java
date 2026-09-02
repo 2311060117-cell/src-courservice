@@ -1,11 +1,6 @@
-// path: auth-service/src/main/java/vn/edu/crs/authservice/security/JwtUtil.java
-// purpose: sinh JWT khi login thanh cong; class nay se duoc COPY sang course-service va 
-// registration-service (ban rut gon, chi giu phan validate) de tung service tu xac thuc token
-
 package vn.edu.crs.authservice.security;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,20 +14,18 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration-ms}")
+    @Value("${jwt.expiration-ms:86400000}")
     private long expirationMs;
 
-    public String generateToken(String username, String role) {
+    public String generateToken(String username, String role, Long userId) {
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + expirationMs);
-
         return Jwts.builder()
-                .setSubject(username)
+                .subject(username)
                 .claim("role", role)
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .claim("userId", userId)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expirationMs))
+                .signWith(key)
                 .compact();
     }
 }

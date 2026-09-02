@@ -1,33 +1,38 @@
 package vn.edu.crs.courseservice;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "course")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "ma_mon_hoc", nullable = false, unique = true)
     private String maMonHoc;
-
-    @Column(name = "ten_mon_hoc", nullable = false)
     private String tenMonHoc;
-
-    @Column(name = "so_tin_chi", nullable = false)
     private Integer soTinChi;
-
-    @Column(name = "so_cho_toi_da", nullable = false)
+    private Integer soChoConLai;
     private Integer soChoToiDa;
 
-    @Column(name = "so_cho_con_lai", nullable = false)
-    private Integer soChoConLai;
+    public Course() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getMaMonHoc() { return maMonHoc; }
+    public void setMaMonHoc(String maMonHoc) { this.maMonHoc = maMonHoc; }
+
+    public String getTenMonHoc() { return tenMonHoc; }
+    public void setTenMonHoc(String tenMonHoc) { this.tenMonHoc = tenMonHoc; }
+
+    public Integer getSoTinChi() { return soTinChi; }
+    public void setSoTinChi(Integer soTinChi) { this.soTinChi = soTinChi; }
+
+    public Integer getSoChoConLai() { return soChoConLai; }
+    public void setSoChoConLai(Integer soChoConLai) { this.soChoConLai = soChoConLai; }
+
+    public Integer getSoChoToiDa() { return soChoToiDa; }
+    public void setSoChoToiDa(Integer soChoToiDa) { this.soChoToiDa = soChoToiDa; }
 }
